@@ -61,6 +61,17 @@ the profile, and the decision card updates.
 Top bar: `New`, `Import raw SASW`, `Open project`, `Add curve`, `Attach KPT`, `Save project`,
 `Export table` (founding-level table of every foundation as CSV) and the light/dark switch.
 
+## Download
+
+Ready-made programs for version 0.1.0 are on the [releases page](https://github.com/Sompote/VSFuse/releases):
+
+| System | File | Notes |
+|---|---|---|
+| macOS 10.13 or newer, Intel and Apple silicon | `VsFuse-0.1.0-macos-universal.zip` | Unzip and open `VsFuse.app`. The app is not notarised: the first time, right-click it and choose Open, or allow it under System Settings, Privacy and Security. |
+| Windows 10 or 11, 64-bit | `VsFuse-0.1.0-windows-x64.zip` | Unzip and run `VsFuse.exe`. SmartScreen may ask for confirmation because the program is not signed. |
+
+Both packages include the three example foundations. `dist/package.sh` rebuilds them.
+
 ## Install and run
 
 Rust 1.85 or newer is needed. The first build takes a few minutes.
