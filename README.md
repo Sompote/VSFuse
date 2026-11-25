@@ -74,8 +74,46 @@ target/release/vsfuse                                            the window, wit
 target/release/vsfuse project.json                               the window, with your project
 target/release/vsfuse process RAW_DIR project.json [table.csv]   raw records to a project and a table, no window
 target/release/vsfuse batch project.json table.csv               founding-level table of a project, no window
+target/release/vsfuse --mcp [--project project.json]             the tools as an MCP server, for an agent
 cargo test --release                                             checks the forward pass against PyTorch
 ```
+
+## Use by an AI agent (MCP)
+
+`vsfuse --mcp` runs the program as a Model Context Protocol server on stdio, with no window. An
+agent can then process raw records, attach soundings, read profiles and decisions, change the rule
+and export tables. One project is held in memory for the session; `--project file.json` opens one
+at the start.
+
+Register it with Claude Code:
+
+```text
+claude mcp add --scope user vsfuse -- /full/path/to/target/release/vsfuse --mcp
+```
+
+or in any MCP client configuration:
+
+```json
+{"mcpServers": {"vsfuse": {"command": "/full/path/to/target/release/vsfuse", "args": ["--mcp"]}}}
+```
+
+| Tool | What it does |
+|---|---|
+| `new_project`, `open_project`, `save_project` | Start, open or save the project in memory |
+| `process_raw` | Raw SASW records of one site folder, or of a folder of sites, to dispersion curves |
+| `add_curve` | Add a foundation from a dispersion curve given as arrays |
+| `attach_kpt` | Attach a KPT sounding (depths and N20) to a foundation |
+| `remove_site` | Remove a foundation |
+| `list_sites` | Every foundation with Vs at the founding depth, probability and verdict |
+| `get_site` | Decision, Vs per layer with 95 % range (SASW alone and fused), curve, record report |
+| `get_rule`, `set_rule` | Read or change the founding-level rule |
+| `summary` | Verdict counts and the foundations whose decision is uncertain |
+| `export_table`, `export_profile` | Write the founding-level table or one profile as CSV |
+| `screenshot` | Render the window for one foundation to a PNG (needs a display) |
+
+A typical request to the agent: *"Process the records in `/data/bridge12`, attach this sounding to
+P3, and tell me which piers cannot be founded at 2 m."* The agent calls `process_raw`, `attach_kpt`,
+`set_rule` and `summary`, and reads the profile of any pier with `get_site`.
 
 ## Inputs
 
@@ -213,6 +251,7 @@ src/model.rs      forward pass of the estimator
 src/data.rs       project file, text import, KPT conversion
 src/decision.rs   founding-level rule
 src/engine.rs     batch runs and CSV tables
+src/mcp.rs        MCP server for agents
 src/app.rs        the window
 src/theme.rs, src/chrome.rs   colours, fonts and widgets
 assets/model.vsf  trained network (38 MB)

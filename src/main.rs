@@ -4,6 +4,7 @@
 //! ```text
 //! vsfuse [project.json]                 the window
 //! vsfuse batch project.json out.csv     founding-level table of every foundation, no window
+//! vsfuse --mcp [--project file.json]   the tools as an MCP server on stdio, for an agent
 //! ```
 
 mod app;
@@ -12,6 +13,7 @@ mod data;
 mod decision;
 mod engine;
 mod frontend;
+mod mcp;
 mod model;
 mod num;
 mod theme;
@@ -75,6 +77,14 @@ fn process(args: &[String]) -> Result<(), String> {
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if args.iter().any(|a| a == "--mcp") {
+        let project = args.iter().position(|a| a == "--project").and_then(|i| args.get(i + 1)).map(PathBuf::from);
+        if let Err(e) = mcp::serve(project) {
+            eprintln!("vsfuse --mcp: {e}");
+            std::process::exit(1);
+        }
+        return;
+    }
     if args.get(1).map(String::as_str) == Some("process") {
         if let Err(e) = process(&args) {
             eprintln!("vsfuse: {e}");
