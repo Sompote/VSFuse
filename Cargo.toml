@@ -1,0 +1,21 @@
+[package]
+name = "vsfuse"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "VsFuse: neural fusion of SASW dispersion curves and Kunzelstab soundings for founding-level evaluation"
+
+[[bin]]
+name = "vsfuse"
+path = "src/main.rs"
+
+[dependencies]
+eframe = "0.31"
+image = { version = "0.25", default-features = false, features = ["png"] }
+rfd = "0.17"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+libm = "0.2"
+
+[profile.release]
+opt-level = 3
